@@ -1,6 +1,13 @@
 import React, { memo } from "react";
 
 import { Handle } from "react-flow-renderer";
+import styled from "styled-components";
+
+const SensorWrapper = styled.div`
+  position: fixed;
+  margin-top: 20px;
+  font-size: small;
+`;
 
 const HandleWrapper = ({ type, position, index, isConnectable, ...props }) => (
   <Handle
@@ -13,9 +20,33 @@ const HandleWrapper = ({ type, position, index, isConnectable, ...props }) => (
   />
 );
 
+const ImageWrapper = styled.img`
+  max-width: 100%;
+`;
+
+const SIZE_WIDTH = {
+  container: {
+    small: 100,
+    medium: 150,
+    large: 200,
+  },
+  title: {
+    small: "0.8rem",
+    medium: "1rem",
+    large: "1.2rem",
+  },
+};
+
 export default memo(({ data, isConnectable }) => {
-  const { sensors, image, machine, portIn = 0, portOut = 0 } = data;
-  console.log("portIn: ", portIn);
+  const {
+    sensors = [],
+    image,
+    machine,
+    portIn = 1,
+    portOut = 1,
+    size = "medium",
+  } = data;
+
   return (
     <>
       {Array.from(Array(portIn)).map((_, i) => {
@@ -31,26 +62,28 @@ export default memo(({ data, isConnectable }) => {
           />
         );
       })}
-      <div style={{ width: 250 }}>
-        <div>{machine}</div>
+      <div style={{ width: SIZE_WIDTH.container[size], position: "relative" }}>
+        <div
+          style={{
+            fontSize: SIZE_WIDTH.title[size],
+          }}
+        >
+          {machine}
+        </div>
         <div style={{ textAlign: "center" }}>
-          <img src={image} alt={machine} />
+          <ImageWrapper src={image} alt={machine} />
         </div>
-        <div style={{ borderTop: "1px solid gray", fontSize: "small" }}>
+        <SensorWrapper>
           {sensors.map((sensor) => (
-            <span>
-              {sensor.label} = {sensor.value} |{" "}
-            </span>
+            <>
+              {sensor.label} = {sensor.value} <br />
+            </>
           ))}
-        </div>
+        </SensorWrapper>
       </div>
 
       {Array.from(Array(portOut)).map((_, i) => {
         const index = i + 1;
-        console.log(
-          "🚀 ~ file: CustomNode.js ~ line 50 ~ {Array.from ~ index",
-          index
-        );
         return (
           <HandleWrapper
             type="source"
@@ -62,26 +95,6 @@ export default memo(({ data, isConnectable }) => {
           />
         );
       })}
-
-      {/* <Handle
-        type="source"
-        position="right"
-        id="a"
-        style={{ top: 10, background: "#555" }}
-        isConnectable={isConnectable}
-      />
-      <Handle
-        type="source"
-        position="right"
-        id="b"
-        style={{
-          bottom: 10,
-          top: "auto",
-          background: "#555",
-          borderRadius: "0%",
-        }}
-        isConnectable={isConnectable}
-      /> */}
     </>
   );
 });
