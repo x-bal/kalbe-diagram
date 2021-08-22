@@ -14,7 +14,6 @@ import CustomNode from "./CustomNode";
 
 import "./index.css";
 import styled from "styled-components";
-import { initialElement } from "./dummy";
 import API from "./API";
 import { constructData, deconstructData } from "./utils/constructor";
 
