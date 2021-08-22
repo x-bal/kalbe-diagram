@@ -41,7 +41,7 @@ export default memo(({ data, isConnectable }) => {
   const {
     sensors = [],
     image,
-    machine,
+    name,
     portIn = 1,
     portOut = 1,
     size = "medium",
@@ -62,16 +62,21 @@ export default memo(({ data, isConnectable }) => {
           />
         );
       })}
-      <div style={{ width: SIZE_WIDTH.container[size], position: "relative" }}>
+      <div
+        style={{
+          width: SIZE_WIDTH.container[size || "medium"],
+          position: "relative",
+        }}
+      >
         <div
           style={{
-            fontSize: SIZE_WIDTH.title[size],
+            fontSize: SIZE_WIDTH.title[size || "medium"],
           }}
         >
-          {machine}
+          {name}
         </div>
         <div style={{ textAlign: "center" }}>
-          <ImageWrapper src={image} alt={machine} />
+          <ImageWrapper src={image} alt={name} />
         </div>
         <SensorWrapper>
           {sensors.map((sensor) => (
