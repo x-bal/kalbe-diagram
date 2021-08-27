@@ -36,10 +36,10 @@ const nodeTypes = {
   custom: CustomNode,
 };
 
-const isDiagramEditable = true;
-const ID = 1;
-
 const CustomNodeFlow = () => {
+  const urlSearchParams = new URLSearchParams(window.location.search);
+  const params = Object.fromEntries(urlSearchParams.entries());
+  const isPublic = params.isPublic === "true";
   const [reactflowInstance, setReactflowInstance] = useState(null);
   const [elements, setElements] = useState([]);
   const [mappedElement, setMappedElement] = useState({});
@@ -57,7 +57,7 @@ const CustomNodeFlow = () => {
   useEffect(() => {
     const _loadData = async () => {
       try {
-        const data = await API.lineProcess.get(ID);
+        const data = await API.lineProcess.get(params.id);
         const elements = constructData(data);
         setElements(elements);
 
@@ -69,7 +69,7 @@ const CustomNodeFlow = () => {
       }
     };
     _loadData();
-  }, []);
+  }, [params.id]);
 
   const _onElementsRemove = useCallback((elementsToRemove) => {
     const edges = elementsToRemove.filter((element) => isEdge(element));
@@ -163,7 +163,7 @@ const CustomNodeFlow = () => {
     const data = await deconstructData(elements);
 
     try {
-      await API.lineProcess.update(ID, data);
+      await API.lineProcess.update(params.id, data);
     } catch (error) {
       console.log("error", error);
     }
@@ -231,9 +231,9 @@ const CustomNodeFlow = () => {
           multiSelectionKeyCode={null}
           onEdgeUpdate={_onEdgeUpdate}
           onEdgeDoubleClick={(_, el) => console.log("onEdgeDoubleClick", el)}
-          nodesDraggable={isDiagramEditable}
-          nodesConnectable={isDiagramEditable}
-          elementsSelectable={isDiagramEditable}
+          nodesDraggable={!isPublic}
+          nodesConnectable={!isPublic}
+          elementsSelectable={!isPublic}
           onNodeDragStop={_onNodeDragStop}
           selectNodesOnDrag={false}
         >
