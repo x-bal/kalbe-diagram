@@ -11,7 +11,6 @@ import ReactFlow, {
 } from "react-flow-renderer";
 
 import CustomNode from "./CustomNode";
-
 import "./index.css";
 import styled from "styled-components";
 import API from "./API";
@@ -43,6 +42,7 @@ const ID = 1;
 const CustomNodeFlow = () => {
   const [reactflowInstance, setReactflowInstance] = useState(null);
   const [elements, setElements] = useState([]);
+  const [mappedElement, setMappedElement] = useState({});
   const [selectedElement, setSelectedElement] = useState({});
   const [typeSelected, setTypeSelected] = useState("");
   const [isFirstLoad, setFirstLoad] = useState(true);
@@ -60,7 +60,10 @@ const CustomNodeFlow = () => {
         const data = await API.lineProcess.get(ID);
         const elements = constructData(data);
         setElements(elements);
-        console.log("elements", elements);
+
+        let mE = {};
+        elements.forEach((element) => (mE[element.id] = element));
+        setMappedElement(mE);
       } catch (error) {
         console.log("error", error);
       }
@@ -82,7 +85,6 @@ const CustomNodeFlow = () => {
   );
 
   const _onNodeDragStop = (_, element) => {
-    console.log("element", element);
     setElements((els) =>
       els.map((el) => {
         if (el.id === element.id) {
@@ -97,7 +99,6 @@ const CustomNodeFlow = () => {
   };
 
   const _onElementClick = (_, element) => {
-    console.log("element", element);
     setSelectedElement(element);
 
     if (isEdge(element)) {
@@ -109,6 +110,18 @@ const CustomNodeFlow = () => {
   };
 
   const updateElement = (type, value) => {
+    if (typeSelected === "edge") {
+      const newConnection = {
+        ...selectedElement,
+        [type]: value === "none" ? null : value,
+      };
+
+      setElements((els) => {
+        const otherEls = els.filter((e) => e.id !== selectedElement.id);
+        return [...otherEls, newConnection];
+      });
+      return;
+    }
     setSelectedElement((el) => ({
       ...el,
       data: {
@@ -169,7 +182,7 @@ const CustomNodeFlow = () => {
               <InputWrapper>
                 <label>Tipe ArrowHead</label>
                 <select
-                  value={selectedElement.arrowHeadType}
+                  value={mappedElement[selectedElement.id].arrowHeadType}
                   onChange={(e) =>
                     updateElement("arrowHeadType", e.target.value)
                   }
