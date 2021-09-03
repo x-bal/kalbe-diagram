@@ -13,7 +13,11 @@ const HandleWrapper = ({ type, position, index, isConnectable, ...props }) => (
   <Handle
     type={type}
     position={position}
-    style={{ background: "#555", top: 15 * index, borderRadius: 0 }}
+    style={{
+      background: type === "source" ? "red" : "green",
+      top: 15 * index,
+      borderRadius: "100%",
+    }}
     onConnect={(params) => console.log("handle onConnect", params)}
     isConnectable={isConnectable}
     {...props}

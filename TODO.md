@@ -10,6 +10,9 @@
   - [x] deconstruct
 - [x] make sure edge is updatable
 - [ ] socket connection
-- [x] handle delete edge & node(disabled)
+- [x] handle delete edge & node(disabled)s
   - [x] handle delete all edge on select node
-- [ ] handle public diagram
+- [x] handle public diagram
+- [ ] move mapping element to useEffect
+- [ ] handle size 1 to 10
+- [ ]

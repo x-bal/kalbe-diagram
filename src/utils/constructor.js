@@ -9,8 +9,6 @@ export const constructData = (data) => {
 };
 
 const defaultMachineStyle = {
-  border: "1px solid #777",
-  padding: 10,
   background: "white",
 };
 
