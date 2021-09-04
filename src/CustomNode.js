@@ -2,6 +2,7 @@ import React, { memo } from "react";
 
 import { Handle } from "react-flow-renderer";
 import styled from "styled-components";
+import { useLocalStorage } from "@rehooks/local-storage";
 
 const SensorWrapper = styled.div`
   position: fixed;
@@ -41,15 +42,9 @@ const SIZE_WIDTH = {
   },
 };
 
-export default memo(({ data, isConnectable }) => {
-  const {
-    sensors = [],
-    image,
-    name,
-    portIn = 1,
-    portOut = 1,
-    size = "medium",
-  } = data;
+export default memo(({ data, isConnectable, id }) => {
+  const [sensors] = useLocalStorage(`machine_${id}`);
+  const { image, name, portIn = 1, portOut = 1, size = "medium" } = data;
 
   return (
     <>
@@ -83,11 +78,13 @@ export default memo(({ data, isConnectable }) => {
           <ImageWrapper src={image} alt={name} />
         </div>
         <SensorWrapper>
-          {sensors.map((sensor) => (
-            <>
-              {sensor.label} = {sensor.value} <br />
-            </>
-          ))}
+          {Object.keys(sensors || {}).map((key) => {
+            return (
+              <div key={key}>
+                {key}: {sensors[key]}
+              </div>
+            );
+          })}
         </SensorWrapper>
       </div>
 

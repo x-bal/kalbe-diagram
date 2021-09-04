@@ -1,6 +1,7 @@
 lockfileVersion: 5.3
 
 specifiers:
+  '@rehooks/local-storage': 2.4.0
   '@testing-library/jest-dom': ^5.14.1
   '@testing-library/react': ^11.2.7
   '@testing-library/user-event': ^12.8.3
@@ -14,6 +15,7 @@ specifiers:
   web-vitals: ^1.1.2
 
 dependencies:
+  '@rehooks/local-storage': 2.4.0_react@17.0.2
   '@testing-library/jest-dom': 5.14.1
   '@testing-library/react': 11.2.7_react-dom@17.0.2+react@17.0.2
   '@testing-library/user-event': 12.8.3
@@ -1910,6 +1912,14 @@ packages:
       source-map: 0.7.3
       webpack: 4.44.2
       webpack-dev-server: 3.11.1_webpack@4.44.2
+    dev: false
+
+  /@rehooks/local-storage/2.4.0_react@17.0.2:
+    resolution: {integrity: sha512-LoXDbEHsuIckVgBsFAv8SuU/M7memjyfWut9Zf36TQXqqCHBRFv8bweg9PymQCa1aWIMjNrZQflFdo55FDlXYg==}
+    peerDependencies:
+      react: '*'
+    dependencies:
+      react: 17.0.2
     dev: false
 
   /@rollup/plugin-node-resolve/7.1.3_rollup@1.32.1:
