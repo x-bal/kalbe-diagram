@@ -10,7 +10,8 @@ import ReactFlow, {
   isNode,
 } from "react-flow-renderer";
 
-import CustomNode from "./CustomNode";
+import MachineNode from "./MachineNode";
+import SensorNode from "./SensorNode";
 import "./index.css";
 import styled from "styled-components";
 import API from "./API";
@@ -22,6 +23,7 @@ const FormWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px;
+  height: 50px;
 `;
 
 const InputWrapper = styled.div`
@@ -33,7 +35,8 @@ const InputWrapper = styled.div`
 
 const snapGrid = [20, 20];
 const nodeTypes = {
-  custom: CustomNode,
+  machine: MachineNode,
+  sensor: SensorNode,
 };
 
 const CustomNodeFlow = () => {
@@ -170,54 +173,61 @@ const CustomNodeFlow = () => {
   };
   return (
     <div style={{ width: "100vw", height: "100vh" }}>
-      <FormWrapper>
-        <div>
-          <InputWrapper>
-            <label>{typeSelected} ID</label>
-            <input value={selectedElement.id} disabled />
-          </InputWrapper>
+      {!isPublic && (
+        <FormWrapper>
+          <div>
+            <InputWrapper>
+              <label>{typeSelected} ID</label>
+              <input value={selectedElement.id} disabled />
+            </InputWrapper>
 
-          {typeSelected === "edge" && (
-            <>
-              <InputWrapper>
-                <label>Tipe ArrowHead</label>
-                <select
-                  value={mappedElement[selectedElement.id].arrowHeadType}
-                  onChange={(e) =>
-                    updateElement("arrowHeadType", e.target.value)
-                  }
-                >
-                  <option value="none">none</option>
-                  <option value="arrow">arrow</option>
-                  <option value="arrowclosed">arrowclosed</option>
-                </select>
-              </InputWrapper>
-            </>
-          )}
-          {typeSelected === "node" && (
-            <>
-              <InputWrapper>
-                <label>Size </label>
-                <div style={{ display: "none" }}>
-                  {selectedElement.data.size}
-                </div>
-                <select
-                  value={selectedElement.data.size}
-                  onChange={(e) => updateElement("size", e.target.value)}
-                >
-                  <option value="small">small</option>
-                  <option value="medium">medium</option>
-                  <option value="large">large</option>
-                </select>
-              </InputWrapper>
-            </>
-          )}
-        </div>
-        <div>
-          <button onClick={_updateData}>Save</button>
-        </div>
-      </FormWrapper>
-      <div style={{ width: "100%", height: "calc(100% - 150px)" }}>
+            {typeSelected === "edge" && (
+              <>
+                <InputWrapper>
+                  <label>Tipe ArrowHead</label>
+                  <select
+                    value={mappedElement[selectedElement.id].arrowHeadType}
+                    onChange={(e) =>
+                      updateElement("arrowHeadType", e.target.value)
+                    }
+                  >
+                    <option value="none">none</option>
+                    <option value="arrow">arrow</option>
+                    <option value="arrowclosed">arrowclosed</option>
+                  </select>
+                </InputWrapper>
+              </>
+            )}
+            {typeSelected === "node" && (
+              <>
+                <InputWrapper>
+                  <label>Size </label>
+                  <div style={{ display: "none" }}>
+                    {selectedElement.data.size}
+                  </div>
+                  <select
+                    value={selectedElement.data.size}
+                    onChange={(e) => updateElement("size", e.target.value)}
+                  >
+                    <option value="small">small</option>
+                    <option value="medium">medium</option>
+                    <option value="large">large</option>
+                  </select>
+                </InputWrapper>
+              </>
+            )}
+          </div>
+          <div>
+            <button onClick={_updateData}>Save</button>
+          </div>
+        </FormWrapper>
+      )}
+      <div
+        style={{
+          width: "100%",
+          height: isPublic ? "100%" : "calc(100% - 100px)",
+        }}
+      >
         <ReactFlow
           elements={elements}
           onElementClick={_onElementClick}

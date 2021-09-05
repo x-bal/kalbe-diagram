@@ -14,12 +14,14 @@ const defaultMachineStyle = {
 
 const defaultMachineProps = {
   selectable: false,
-  type: "custom",
+  type: "machine",
 };
 
-const _constructMachines = (machines) =>
-  machines.map((machine, index) => {
-    const {
+const _constructMachines = (machines) => {
+  let constructedMachines = [];
+  let sensors = [];
+  machines.forEach((machine, index) => {
+    let {
       id,
       name,
       style,
@@ -29,7 +31,8 @@ const _constructMachines = (machines) =>
       image,
       size = "medium",
     } = machine;
-    return {
+    position = position || {};
+    constructedMachines.push({
       id: String(id),
       data: {
         name,
@@ -39,20 +42,58 @@ const _constructMachines = (machines) =>
         size,
       },
       style: style || defaultMachineStyle,
-      position: position || { y: 0, x: 200 * (index + 1) },
+      position: position.machine || { y: 0, x: 200 * (index + 1) },
       ...defaultMachineProps,
-    };
+    });
+    sensors.push({
+      id: `sensor_${id}`,
+      position: position.machine || { y: 400, x: 200 * (index + 1) },
+      type: "sensor",
+      selectable: false,
+      style: {
+        border: "1px solid black",
+        padding: "10px",
+        background: "white",
+      },
+      data: {
+        machine_id: String(id),
+        machine_name: name,
+      },
+    });
   });
+  return [...constructedMachines, ...sensors];
+};
 
 export const deconstructData = (data) => {
-  const machinesFiltered = data.filter((item) => isNode(item));
+  console.log("deconstructData", data);
+  const nodes = data.filter((item) => isNode(item));
   const edges = data.filter((item) => isEdge(item));
-  const machines = _deconstructMachines(machinesFiltered);
+  const machines = _deconstructMachines(nodes);
   return { machines, edges };
 };
 
-const _deconstructMachines = (machines) =>
-  machines.map((machine) => {
-    const { data, id, style, position } = machine;
-    return { id: parseInt(id), style, position, ...data };
+const _deconstructMachines = (nodes) => {
+  let mappedMachines = {},
+    machines = [];
+  nodes.forEach((node) => {
+    if (node.type === "machine") {
+      const { data, id, style, position } = node;
+      mappedMachines[id] = {
+        id: parseInt(id),
+        style,
+        position: { machine: position },
+        ...data,
+      };
+    }
+    if (node.type === "sensor") {
+      const { data, position } = node;
+      mappedMachines[data.machine_id].position.sensor = position;
+    }
   });
+
+  Object.keys(mappedMachines).forEach((key) => {
+    machines.push(mappedMachines[key]);
+  });
+
+  return machines;
+};

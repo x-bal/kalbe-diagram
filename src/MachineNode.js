@@ -1,14 +1,6 @@
 import React, { memo } from "react";
-
 import { Handle } from "react-flow-renderer";
 import styled from "styled-components";
-import { useLocalStorage } from "@rehooks/local-storage";
-
-const SensorWrapper = styled.div`
-  position: fixed;
-  margin-top: 20px;
-  font-size: small;
-`;
 
 const HandleWrapper = ({ type, position, index, isConnectable, ...props }) => (
   <Handle
@@ -42,8 +34,7 @@ const SIZE_WIDTH = {
   },
 };
 
-export default memo(({ data, isConnectable, id }) => {
-  const [sensors] = useLocalStorage(`machine_${id}`);
+export default memo(({ data, isConnectable }) => {
   const { image, name, portIn = 1, portOut = 1, size = "medium" } = data;
 
   return (
@@ -77,15 +68,6 @@ export default memo(({ data, isConnectable, id }) => {
         <div style={{ textAlign: "center" }}>
           <ImageWrapper src={image} alt={name} />
         </div>
-        <SensorWrapper>
-          {Object.keys(sensors || {}).map((key) => {
-            return (
-              <div key={key}>
-                {key}: {sensors[key]}
-              </div>
-            );
-          })}
-        </SensorWrapper>
       </div>
 
       {Array.from(Array(portOut)).map((_, i) => {
