@@ -29,7 +29,7 @@ const _constructMachines = (machines) => {
       portIn,
       portOut,
       image,
-      size = "medium",
+      size = 3,
     } = machine;
     position = position || {};
     constructedMachines.push({
@@ -39,7 +39,7 @@ const _constructMachines = (machines) => {
         portIn,
         portOut,
         image,
-        size,
+        size: typeof size === "string" ? 3 : size,
       },
       style: style || defaultMachineStyle,
       position: position.machine || { y: 0, x: 200 * (index + 1) },

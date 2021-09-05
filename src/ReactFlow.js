@@ -31,6 +31,7 @@ const InputWrapper = styled.div`
   label {
     margin-right: 10px;
   }
+  margin-right: 20px;
 `;
 
 const snapGrid = [20, 20];
@@ -205,14 +206,13 @@ const CustomNodeFlow = () => {
                   <div style={{ display: "none" }}>
                     {selectedElement.data.size}
                   </div>
-                  <select
+                  <input
+                    type="number"
+                    min={1}
+                    max={10}
                     value={selectedElement.data.size}
                     onChange={(e) => updateElement("size", e.target.value)}
-                  >
-                    <option value="small">small</option>
-                    <option value="medium">medium</option>
-                    <option value="large">large</option>
-                  </select>
+                  />
                 </InputWrapper>
               </>
             )}

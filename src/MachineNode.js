@@ -21,21 +21,17 @@ const ImageWrapper = styled.img`
   max-width: 100%;
 `;
 
-const SIZE_WIDTH = {
-  container: {
-    small: 100,
-    medium: 150,
-    large: 200,
-  },
-  title: {
-    small: "0.8rem",
-    medium: "1rem",
-    large: "1.2rem",
-  },
+const FONT_SIZE = {
+  small: "0.7rem",
+  medium: "1rem",
+  large: "1.2rem",
 };
 
+const BASE_SIZE = 50;
+
 export default memo(({ data, isConnectable }) => {
-  const { image, name, portIn = 1, portOut = 1, size = "medium" } = data;
+  const { image, name, portIn = 1, portOut = 1, size = 3 } = data;
+  const fontSize = size > 7 ? "large" : size > 4 ? "medium" : "small";
 
   return (
     <>
@@ -54,20 +50,23 @@ export default memo(({ data, isConnectable }) => {
       })}
       <div
         style={{
-          width: SIZE_WIDTH.container[size || "medium"],
+          width: BASE_SIZE * size,
+          minHeight: BASE_SIZE * size,
           position: "relative",
         }}
       >
         <div
           style={{
-            fontSize: SIZE_WIDTH.title[size || "medium"],
+            fontSize: FONT_SIZE[fontSize || "medium"],
           }}
         >
           {name}
         </div>
-        <div style={{ textAlign: "center" }}>
-          <ImageWrapper src={image} alt={name} />
-        </div>
+        {image && (
+          <div style={{ textAlign: "center" }}>
+            <ImageWrapper src={image} alt={name} />
+          </div>
+        )}
       </div>
 
       {Array.from(Array(portOut)).map((_, i) => {
