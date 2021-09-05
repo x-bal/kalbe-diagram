@@ -64,16 +64,18 @@ const CustomNodeFlow = () => {
         const data = await API.lineProcess.get(params.id);
         const elements = constructData(data);
         setElements(elements);
-
-        let mE = {};
-        elements.forEach((element) => (mE[element.id] = element));
-        setMappedElement(mE);
       } catch (error) {
         console.log("error", error);
       }
     };
     _loadData();
   }, [params.id]);
+
+  useEffect(() => {
+    let mE = {};
+    elements.forEach((element) => (mE[element.id] = element));
+    setMappedElement(mE);
+  }, [elements]);
 
   const _onElementsRemove = useCallback((elementsToRemove) => {
     const edges = elementsToRemove.filter((element) => isEdge(element));
@@ -199,7 +201,7 @@ const CustomNodeFlow = () => {
                 </InputWrapper>
               </>
             )}
-            {typeSelected === "node" && (
+            {typeSelected === "node" && selectedElement.type === "machine" && (
               <>
                 <InputWrapper>
                   <label>Size </label>
