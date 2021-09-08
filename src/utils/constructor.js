@@ -8,10 +8,6 @@ export const constructData = (data) => {
   return [...machinesObj, ...edges];
 };
 
-const defaultMachineStyle = {
-  background: "white",
-};
-
 const defaultMachineProps = {
   selectable: false,
   type: "machine",
@@ -41,7 +37,7 @@ const _constructMachines = (machines) => {
         image,
         size: typeof size === "string" ? 3 : size,
       },
-      style: style || defaultMachineStyle,
+      style: style || {},
       position: position.machine || { y: 0, x: 200 * (index + 1) },
       ...defaultMachineProps,
     });
