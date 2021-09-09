@@ -78,6 +78,8 @@ const CustomNodeFlow = () => {
   }, [elements]);
 
   const _onElementsRemove = useCallback((elementsToRemove) => {
+    setSelectedElement({});
+    setTypeSelected("");
     const edges = elementsToRemove.filter((element) => isEdge(element));
     setElements((els) => removeElements(edges, els));
   }, []);
@@ -248,6 +250,7 @@ const CustomNodeFlow = () => {
           elementsSelectable={!isPublic}
           onNodeDragStop={_onNodeDragStop}
           selectNodesOnDrag={false}
+          deleteKeyCode="Delete"
         >
           <Controls />
           <Background />
