@@ -26,14 +26,6 @@ const FormWrapper = styled.div`
   height: 50px;
 `;
 
-const InputWrapper = styled.div`
-  display: inline-block;
-  label {
-    margin-right: 10px;
-  }
-  margin-right: 20px;
-`;
-
 const snapGrid = [20, 20];
 const nodeTypes = {
   machine: MachineNode,
@@ -181,48 +173,59 @@ const CustomNodeFlow = () => {
       {!isPublic && (
         <FormWrapper>
           <div>
-            <InputWrapper>
-              <label>{typeSelected} ID</label>
-              <input value={selectedElement.id} disabled />
-            </InputWrapper>
-
             {typeSelected === "edge" && (
               <>
-                <InputWrapper>
-                  <label>Tipe ArrowHead</label>
-                  <select
-                    value={mappedElement[selectedElement.id].arrowHeadType}
-                    onChange={(e) =>
-                      updateElement("arrowHeadType", e.target.value)
-                    }
-                  >
-                    <option value="none">none</option>
-                    <option value="arrow">arrow</option>
-                    <option value="arrowclosed">arrowclosed</option>
-                  </select>
-                </InputWrapper>
+                <div className="row g-3 align-items-center">
+                  <div className="col-auto">
+                    <label for="inputPassword6" className="col-form-label">
+                      Tipe ArrowHead
+                    </label>
+                  </div>
+                  <div className="col-auto">
+                    <select
+                      value={mappedElement[selectedElement.id].arrowHeadType}
+                      className="form-control"
+                      onChange={(e) =>
+                        updateElement("arrowHeadType", e.target.value)
+                      }
+                    >
+                      <option value="none">none</option>
+                      <option value="arrow">arrow</option>
+                      <option value="arrowclosed">arrowclosed</option>
+                    </select>
+                  </div>
+                </div>
               </>
             )}
             {typeSelected === "node" && selectedElement.type === "machine" && (
               <>
-                <InputWrapper>
-                  <label>Size </label>
-                  <div style={{ display: "none" }}>
-                    {selectedElement.data.size}
+                <div className="row g-3 align-items-center">
+                  <div className="col-auto">
+                    <label for="inputPassword6" className="col-form-label">
+                      Size
+                    </label>
                   </div>
-                  <input
-                    type="number"
-                    min={1}
-                    max={10}
-                    value={selectedElement.data.size}
-                    onChange={(e) => updateElement("size", e.target.value)}
-                  />
-                </InputWrapper>
+                  <div className="col-auto">
+                    <div style={{ display: "none" }}>
+                      {selectedElement.data.size}
+                    </div>
+                    <input
+                      type="number"
+                      className="form-control"
+                      min={1}
+                      max={10}
+                      value={selectedElement.data.size}
+                      onChange={(e) => updateElement("size", e.target.value)}
+                    />
+                  </div>
+                </div>
               </>
             )}
           </div>
           <div>
-            <button onClick={_updateData}>Save</button>
+            <button className="btn btn-danger" onClick={_updateData}>
+              Deploy
+            </button>
           </div>
         </FormWrapper>
       )}

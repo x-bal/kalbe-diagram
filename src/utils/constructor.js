@@ -43,13 +43,14 @@ const _constructMachines = (machines) => {
     });
     sensors.push({
       id: `sensor_${id}`,
-      position: position.machine || { y: 400, x: 200 * (index + 1) },
+      position: position.sensor || { y: 400, x: 200 * (index + 1) },
       type: "sensor",
       selectable: false,
       style: {
-        border: "1px solid black",
         padding: "10px",
         background: "white",
+        opacity: 0.5,
+        borderRadius: 5,
       },
       data: {
         machine_id: String(id),
@@ -83,7 +84,7 @@ const _deconstructMachines = (nodes) => {
     }
     if (node.type === "sensor") {
       const { data, position } = node;
-      mappedMachines[data.machine_id].position.sensor = position;
+      mappedMachines[data.machine_id]["position"]["sensor"] = position;
     }
   });
 
