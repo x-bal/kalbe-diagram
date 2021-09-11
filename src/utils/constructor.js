@@ -74,11 +74,12 @@ const _deconstructMachines = (nodes) => {
     machines = [];
   nodes.forEach((node) => {
     if (node.type === "machine") {
-      const { data, id, style, position } = node;
+      const { data, id, style, position, size } = node;
       mappedMachines[id] = {
         id: parseInt(id),
         style,
         position: { machine: position },
+        size: parseInt(size),
         ...data,
       };
     }
