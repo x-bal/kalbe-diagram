@@ -255,7 +255,7 @@ const CustomNodeFlow = () => {
           selectNodesOnDrag={false}
           deleteKeyCode="Delete"
         >
-          <Controls />
+          <Controls showInteractive={false} />
           <Background />
         </ReactFlow>
       </div>
