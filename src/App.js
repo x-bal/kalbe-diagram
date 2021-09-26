@@ -22,6 +22,10 @@ function App() {
     };
   });
 
+  socket.on("machine-status", ({ machine_id, status }) => {
+    writeStorage(`machine_status_${machine_id}`, status);
+  });
+
   useEffect(() => {
     window.localStorage.clear();
   }, []);

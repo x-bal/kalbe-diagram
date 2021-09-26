@@ -1,6 +1,13 @@
-import React, { memo } from "react";
+import React, { memo, useEffect, useState } from "react";
 import { Handle } from "react-flow-renderer";
 import styled from "styled-components";
+import { useLocalStorage } from "@rehooks/local-storage";
+
+const STATUS_MACHINE = {
+  STOP: "STOP",
+  RUN: "RUN",
+  OFFLINE: "OFFLINE",
+};
 
 const HandleWrapper = ({ type, position, index, isConnectable, ...props }) => (
   <Handle
@@ -29,9 +36,40 @@ const FONT_SIZE = {
 
 const BASE_SIZE = 50;
 
-export default memo(({ data, isConnectable }) => {
-  const { image, name, portIn = 1, portOut = 1, size = 3 } = data;
+// default offline
+
+export default memo(({ id, data, isConnectable }) => {
+  const {
+    imageRun,
+    imageOffline,
+    imageStop,
+    name,
+    portIn = 1,
+    portOut = 1,
+    size = 3,
+  } = data;
+  const [image, setImage] = useState(imageOffline);
+  const [status] = useLocalStorage(`machine_status_${id}`);
+
   const fontSize = size > 7 ? "large" : size > 4 ? "medium" : "small";
+
+  useEffect(() => {
+    const refreshImage = () => {
+      if (status === STATUS_MACHINE.STOP) {
+        setImage(imageStop);
+        return;
+      }
+      if (status === STATUS_MACHINE.RUN) {
+        setImage(imageRun);
+        return;
+      }
+      if (status === STATUS_MACHINE.OFFLINE) {
+        setImage(imageOffline);
+        return;
+      }
+    };
+    refreshImage();
+  }, [status, imageOffline, imageRun, imageStop]);
 
   return (
     <>
@@ -62,7 +100,7 @@ export default memo(({ data, isConnectable }) => {
         >
           {name}
         </div>
-        {image && (
+        {imageOffline && (
           <div style={{ textAlign: "center" }}>
             <ImageWrapper src={image} alt={name} />
           </div>

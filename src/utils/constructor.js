@@ -24,7 +24,9 @@ const _constructMachines = (machines) => {
       position,
       portIn,
       portOut,
-      image,
+      imageRun,
+      imageOffline,
+      imageStop,
       size = 3,
     } = machine;
     position = position || {};
@@ -34,7 +36,9 @@ const _constructMachines = (machines) => {
         name,
         portIn,
         portOut,
-        image,
+        imageRun,
+        imageOffline,
+        imageStop,
         size: typeof size === "string" ? 3 : size,
       },
       style: style || {},
@@ -62,7 +66,6 @@ const _constructMachines = (machines) => {
 };
 
 export const deconstructData = (data) => {
-  console.log("deconstructData", data);
   const nodes = data.filter((item) => isNode(item));
   const edges = data.filter((item) => isEdge(item));
   const machines = _deconstructMachines(nodes);
