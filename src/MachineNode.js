@@ -1,4 +1,4 @@
-import React, { memo, useEffect, useState } from "react";
+import React, { memo, useEffect, useState, useCallback } from "react";
 import { Handle } from "react-flow-renderer";
 import styled from "styled-components";
 import { useLocalStorage } from "@rehooks/local-storage";
@@ -47,29 +47,38 @@ export default memo(({ id, data, isConnectable }) => {
     portIn = 1,
     portOut = 1,
     size = 3,
+    status: initialStatus,
   } = data;
   const [image, setImage] = useState(imageOffline);
   const [status] = useLocalStorage(`machine_status_${id}`);
 
   const fontSize = size > 7 ? "large" : size > 4 ? "medium" : "small";
 
-  useEffect(() => {
-    const refreshImage = () => {
-      if (status === STATUS_MACHINE.STOP) {
+  const refreshImage = useCallback(
+    (stat) => {
+      if (stat === STATUS_MACHINE.STOP) {
         setImage(imageStop);
         return;
       }
-      if (status === STATUS_MACHINE.RUN) {
+      if (stat === STATUS_MACHINE.RUN) {
         setImage(imageRun);
         return;
       }
-      if (status === STATUS_MACHINE.OFFLINE) {
+      if (stat === STATUS_MACHINE.OFFLINE) {
         setImage(imageOffline);
         return;
       }
-    };
-    refreshImage();
-  }, [status, imageOffline, imageRun, imageStop]);
+    },
+    [imageStop, imageRun, imageOffline]
+  );
+
+  useEffect(() => {
+    refreshImage(status);
+  }, [status, refreshImage]);
+
+  useEffect(() => {
+    refreshImage(initialStatus);
+  }, [initialStatus, refreshImage]);
 
   return (
     <>

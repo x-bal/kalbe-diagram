@@ -27,6 +27,7 @@ const _constructMachines = (machines) => {
       imageRun,
       imageOffline,
       imageStop,
+      status,
       size = 3,
     } = machine;
     position = position || {};
@@ -39,7 +40,8 @@ const _constructMachines = (machines) => {
         imageRun,
         imageOffline,
         imageStop,
-        size: typeof size === "string" ? 3 : size,
+        status,
+        size: typeof size === "string" ? 3 : size || 3,
       },
       style: style || {},
       position: position.machine || { y: 0, x: 200 * (index + 1) },
