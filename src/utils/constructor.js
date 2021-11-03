@@ -1,11 +1,14 @@
 import { isEdge, isNode } from "react-flow-renderer";
 
 export const constructData = (data) => {
-  let { edges = [], machines = [] } = data;
+  let { edges = [], machines = [], background = "{}" } = data;
   edges = Array.isArray(edges) ? edges : [];
 
   const machinesObj = _constructMachines(machines);
-  return [...machinesObj, ...edges];
+  return {
+    elements: [...machinesObj, ...edges],
+    background: background !== null ? JSON.parse(background) : {},
+  };
 };
 
 const defaultMachineProps = {
@@ -67,11 +70,11 @@ const _constructMachines = (machines) => {
   return [...constructedMachines, ...sensors];
 };
 
-export const deconstructData = (data) => {
+export const deconstructData = (data, background) => {
   const nodes = data.filter((item) => isNode(item));
   const edges = data.filter((item) => isEdge(item));
   const machines = _deconstructMachines(nodes);
-  return { machines, edges };
+  return { machines, edges, background: JSON.stringify(background) };
 };
 
 const _deconstructMachines = (nodes) => {

@@ -20,6 +20,12 @@ const lineProcess = {
       method: "PUT",
       data,
     }),
+  uploadBackground: (data) =>
+    request({
+      url: `/line-process/upload-background`,
+      method: "POST",
+      data,
+    }),
 };
 
 const API = {

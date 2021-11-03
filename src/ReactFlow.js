@@ -5,7 +5,6 @@ import ReactFlow, {
   addEdge,
   updateEdge,
   Controls,
-  Background,
   isEdge,
   isNode,
 } from "react-flow-renderer";
@@ -23,7 +22,7 @@ const FormWrapper = styled.div`
   display: flex;
   justify-content: space-between;
   padding: 10px;
-  height: 50px;
+  height: 60px;
 `;
 
 const snapGrid = [20, 20];
@@ -42,6 +41,11 @@ const CustomNodeFlow = () => {
   const [selectedElement, setSelectedElement] = useState({});
   const [typeSelected, setTypeSelected] = useState("");
   const [isFirstLoad, setFirstLoad] = useState(true);
+  const [bgType, setBgType] = useState("");
+  const [bg, setBg] = useState(null);
+  const [bgShow, setBgShow] = useState(false);
+  const [styleDiagram, setStyleDiagram] = useState({});
+  const [reload, setReload] = useState(0);
 
   useEffect(() => {
     if (reactflowInstance && elements.length > 0 && isFirstLoad) {
@@ -54,20 +58,48 @@ const CustomNodeFlow = () => {
     const _loadData = async () => {
       try {
         const data = await API.lineProcess.get(params.id);
-        const elements = constructData(data);
+        const { elements, background } = constructData(data);
+        setBgType(background.type);
+        setBg(background.background);
+        let style = {};
+        if (background.type === "color") {
+          style = {
+            background: background.background,
+          };
+        }
+        if (background.type === "image") {
+          style = {
+            background: `url(${background.background}) no-repeat center center fixed`,
+            backgroundSize: "cover",
+          };
+        }
+        setStyleDiagram(style);
         setElements(elements);
       } catch (error) {
         console.log("error", error);
       }
     };
     _loadData();
-  }, [params.id]);
+  }, [params.id, reload]);
 
   useEffect(() => {
     let mE = {};
     elements.forEach((element) => (mE[element.id] = element));
     setMappedElement(mE);
   }, [elements]);
+
+  const _chooseBackground = (bg) => {
+    setBg(bg);
+
+    if (bgType === "color") {
+      setStyleDiagram({
+        background: bg,
+      });
+
+      return;
+    }
+    return;
+  };
 
   const _onElementsRemove = useCallback((elementsToRemove) => {
     setSelectedElement({});
@@ -159,11 +191,28 @@ const CustomNodeFlow = () => {
     [reactflowInstance]
   );
 
-  const _updateData = async () => {
-    const data = await deconstructData(elements);
+  const _updateBackground = async () => {
+    let background = {
+      type: bgType,
+      background: bg,
+    };
+    if (bgType === "image") {
+      let payload = new FormData();
+      payload.append("background", bg);
+      const { url } = await API.lineProcess.uploadBackground(payload);
+      setBg(url);
+      background.background = url;
+      console.log("url", url);
+    }
 
+    await _updateData(background);
+  };
+
+  const _updateData = async (background = {}) => {
+    const data = await deconstructData(elements, background);
     try {
       await API.lineProcess.update(params.id, data);
+      setReload(reload + 1);
     } catch (error) {
       console.log("error", error);
     }
@@ -172,60 +221,117 @@ const CustomNodeFlow = () => {
     <div style={{ width: "100vw", height: "100vh" }}>
       {!isPublic && (
         <FormWrapper>
-          <div>
+          <div className="row g-3 align-items-center">
             {typeSelected === "edge" && (
               <>
-                <div className="row g-3 align-items-center">
-                  <div className="col-auto">
-                    <label for="inputPassword6" className="col-form-label">
-                      Tipe ArrowHead
-                    </label>
-                  </div>
-                  <div className="col-auto">
-                    <select
-                      value={mappedElement[selectedElement.id].arrowHeadType}
-                      className="form-control"
-                      onChange={(e) =>
-                        updateElement("arrowHeadType", e.target.value)
-                      }
-                    >
-                      <option value="none">none</option>
-                      <option value="arrow">arrow</option>
-                      <option value="arrowclosed">arrowclosed</option>
-                    </select>
-                  </div>
+                <div className="col-auto">
+                  <label for="inputPassword6" className="col-form-label">
+                    Tipe ArrowHead
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <select
+                    value={mappedElement[selectedElement.id].arrowHeadType}
+                    className="form-control"
+                    onChange={(e) =>
+                      updateElement("arrowHeadType", e.target.value)
+                    }
+                  >
+                    <option value="none">none</option>
+                    <option value="arrow">arrow</option>
+                    <option value="arrowclosed">arrowclosed</option>
+                  </select>
                 </div>
               </>
             )}
             {typeSelected === "node" && selectedElement.type === "machine" && (
               <>
-                <div className="row g-3 align-items-center">
-                  <div className="col-auto">
-                    <label for="inputPassword6" className="col-form-label">
-                      Size
-                    </label>
+                <div className="col-auto">
+                  <label for="inputPassword6" className="col-form-label">
+                    Size
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <div style={{ display: "none" }}>
+                    {selectedElement.data.size}
                   </div>
-                  <div className="col-auto">
-                    <div style={{ display: "none" }}>
-                      {selectedElement.data.size}
-                    </div>
-                    <input
-                      type="number"
-                      className="form-control"
-                      min={1}
-                      max={10}
-                      value={selectedElement.data.size}
-                      onChange={(e) => updateElement("size", e.target.value)}
-                    />
-                  </div>
+                  <input
+                    type="number"
+                    className="form-control"
+                    min={1}
+                    max={10}
+                    value={selectedElement.data.size}
+                    onChange={(e) => updateElement("size", e.target.value)}
+                  />
                 </div>
               </>
             )}
           </div>
-          <div>
-            <button className="btn btn-danger" onClick={_updateData}>
-              Deploy
-            </button>
+          <div className="row g-3 align-items-center">
+            {bgShow && (
+              <>
+                <div className="col-auto">
+                  <label for="inputPassword6" className="col-form-label">
+                    Bg Type
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <select
+                    value={bgType}
+                    className="form-control form-control-sm"
+                    onChange={(e) => setBgType(e.target.value)}
+                  >
+                    <option value="">none</option>
+                    <option value="image">Image</option>
+                    <option value="color">Color</option>
+                  </select>
+                </div>
+                {bgType !== "" && (
+                  <>
+                    <div className="col-auto">
+                      {bgType === "color" && (
+                        <input
+                          type="color"
+                          value={bg}
+                          onChange={(e) => _chooseBackground(e.target.value)}
+                        />
+                      )}
+                      {bgType === "image" && (
+                        <input
+                          className="form-control form-control-sm"
+                          type="file"
+                          accept="image/*"
+                          onChange={(e) => _chooseBackground(e.target.files[0])}
+                        />
+                      )}
+                    </div>
+                  </>
+                )}
+                <div className="col-auto">
+                  <button
+                    className="btn btn-sm btn-danger"
+                    type="button"
+                    onClick={_updateBackground}
+                  >
+                    Save Bg
+                  </button>
+                </div>
+              </>
+            )}
+            <div className="col-auto">
+              <button
+                className="btn btn-sm btn-primary"
+                type="button"
+                onClick={() => setBgShow(!bgShow)}
+              >
+                {bgShow ? ">" : "<"} Bg Setting
+              </button>
+            </div>
+            <div className="col-auto">
+              <button className="btn btn-danger" onClick={() => _updateData()}>
+                Deploy
+              </button>
+            </div>
           </div>
         </FormWrapper>
       )}
@@ -254,9 +360,9 @@ const CustomNodeFlow = () => {
           onNodeDragStop={_onNodeDragStop}
           selectNodesOnDrag={false}
           deleteKeyCode="Delete"
+          style={styleDiagram}
         >
           <Controls showInteractive={false} />
-          <Background />
         </ReactFlow>
       </div>
     </div>
