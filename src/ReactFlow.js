@@ -18,6 +18,8 @@ import { constructData, deconstructData } from "./utils/constructor";
 
 const edgeDefaultStyle = { strokeWidth: 2 };
 
+const STROKE_PIXEL = "0.5px";
+
 const FormWrapper = styled.div`
   display: flex;
   justify-content: space-between;
@@ -46,6 +48,11 @@ const CustomNodeFlow = () => {
   const [bgShow, setBgShow] = useState(false);
   const [styleDiagram, setStyleDiagram] = useState({});
   const [reload, setReload] = useState(0);
+  const [isFileSelected, setFileSelected] = useState(false);
+  const [fontStyle, setFontStyle] = useState({
+    color: "black",
+    stroke: "white",
+  });
 
   useEffect(() => {
     if (reactflowInstance && elements.length > 0 && isFirstLoad) {
@@ -61,6 +68,10 @@ const CustomNodeFlow = () => {
         const { elements, background } = constructData(data);
         setBgType(background.type);
         setBg(background.background);
+        setFontStyle({
+          color: background.fontColor,
+          stroke: background.fontStroke,
+        });
         let style = {};
         if (background.type === "color") {
           style = {
@@ -73,6 +84,13 @@ const CustomNodeFlow = () => {
             backgroundSize: "cover",
           };
         }
+
+        if (background.fontColor || background.fontStroke) {
+          style.color = background.fontColor;
+          style.WebkitTextStrokeWidth = STROKE_PIXEL;
+          style.WebkitTextStrokeColor = background.fontStroke;
+        }
+
         setStyleDiagram(style);
         setElements(elements);
       } catch (error) {
@@ -91,9 +109,45 @@ const CustomNodeFlow = () => {
   const _chooseBackground = (bg) => {
     setBg(bg);
 
+    if (bgType === "image") {
+      setFileSelected(true);
+    }
+
     if (bgType === "color") {
       setStyleDiagram({
+        ...styleDiagram,
         background: bg,
+      });
+
+      return;
+    }
+    return;
+  };
+
+  const _chooseFont = (color, type = "color") => {
+    if (type === "color") {
+      setFontStyle({
+        ...fontStyle,
+        color: color,
+      });
+      setStyleDiagram({
+        ...styleDiagram,
+        color,
+      });
+
+      return;
+    }
+
+    if (type === "stroke") {
+      setFontStyle({
+        ...fontStyle,
+        stroke: color,
+      });
+
+      setStyleDiagram({
+        ...styleDiagram,
+        WebkitTextStrokeWidth: STROKE_PIXEL,
+        WebkitTextStrokeColor: color,
       });
 
       return;
@@ -195,15 +249,23 @@ const CustomNodeFlow = () => {
     let background = {
       type: bgType,
       background: bg,
+      fontColor: fontStyle.color,
+      fontStroke: fontStyle.stroke,
     };
-    if (bgType === "image") {
+    if (bgType === "image" && isFileSelected) {
       let payload = new FormData();
       payload.append("background", bg);
       const { url } = await API.lineProcess.uploadBackground(payload);
       setBg(url);
       background.background = url;
-      console.log("url", url);
     }
+
+    background = {
+      type: bgType,
+      background: bg,
+      fontColor: fontStyle.color,
+      fontStroke: fontStyle.stroke,
+    };
 
     await _updateData(background);
   };
@@ -301,6 +363,7 @@ const CustomNodeFlow = () => {
                           className="form-control form-control-sm"
                           type="file"
                           accept="image/*"
+                          style={{ width: "170px" }}
                           onChange={(e) => _chooseBackground(e.target.files[0])}
                         />
                       )}
@@ -308,12 +371,36 @@ const CustomNodeFlow = () => {
                   </>
                 )}
                 <div className="col-auto">
+                  <label for="inputPassword6" className="col-form-label">
+                    Font Color
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="color"
+                    value={fontStyle.color}
+                    onChange={(e) => _chooseFont(e.target.value)}
+                  />
+                </div>
+                <div className="col-auto">
+                  <label for="inputPassword6" className="col-form-label">
+                    Font Stroke
+                  </label>
+                </div>
+                <div className="col-auto">
+                  <input
+                    type="color"
+                    value={fontStyle.stroke}
+                    onChange={(e) => _chooseFont(e.target.value, "stroke")}
+                  />
+                </div>
+                <div className="col-auto">
                   <button
                     className="btn btn-sm btn-danger"
                     type="button"
                     onClick={_updateBackground}
                   >
-                    Save Bg
+                    Save Style
                   </button>
                 </div>
               </>
@@ -324,7 +411,7 @@ const CustomNodeFlow = () => {
                 type="button"
                 onClick={() => setBgShow(!bgShow)}
               >
-                {bgShow ? ">" : "<"} Bg Setting
+                {bgShow ? ">" : "<"} Style Setting
               </button>
             </div>
             <div className="col-auto">
