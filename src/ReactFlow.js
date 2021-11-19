@@ -51,7 +51,8 @@ const CustomNodeFlow = () => {
   const [isFileSelected, setFileSelected] = useState(false);
   const [fontStyle, setFontStyle] = useState({
     color: "black",
-    stroke: "white",
+    useStroke: false,
+    stroke: null,
   });
 
   useEffect(() => {
@@ -71,6 +72,7 @@ const CustomNodeFlow = () => {
         setFontStyle({
           color: background.fontColor,
           stroke: background.fontStroke,
+          useStroke: background.useStroke,
         });
         let style = {};
         if (background.type === "color") {
@@ -85,8 +87,11 @@ const CustomNodeFlow = () => {
           };
         }
 
-        if (background.fontColor || background.fontStroke) {
+        if (background.fontColor) {
           style.color = background.fontColor;
+        }
+
+        if (background.useStroke) {
           style.WebkitTextStrokeWidth = STROKE_PIXEL;
           style.WebkitTextStrokeColor = background.fontStroke;
         }
@@ -124,6 +129,22 @@ const CustomNodeFlow = () => {
     return;
   };
 
+  const _toggleStroke = (value) => {
+    if (value) {
+      setFontStyle({
+        ...fontStyle,
+        useStroke: true,
+      });
+      return;
+    }
+    setStyleDiagram({
+      ...styleDiagram,
+      WebkitTextStrokeWidth: null,
+      WebkitTextStrokeColor: null,
+    });
+    setFontStyle({ ...fontStyle, stroke: null, useStroke: false });
+  };
+
   const _chooseFont = (color, type = "color") => {
     if (type === "color") {
       setFontStyle({
@@ -141,6 +162,7 @@ const CustomNodeFlow = () => {
     if (type === "stroke") {
       setFontStyle({
         ...fontStyle,
+        useStroke: true,
         stroke: color,
       });
 
@@ -246,12 +268,7 @@ const CustomNodeFlow = () => {
   );
 
   const _updateBackground = async () => {
-    let background = {
-      type: bgType,
-      background: bg,
-      fontColor: fontStyle.color,
-      fontStroke: fontStyle.stroke,
-    };
+    let background = {};
     if (bgType === "image" && isFileSelected) {
       let payload = new FormData();
       payload.append("background", bg);
@@ -265,6 +282,7 @@ const CustomNodeFlow = () => {
       background: bg,
       fontColor: fontStyle.color,
       fontStroke: fontStyle.stroke,
+      useStroke: fontStyle.useStroke,
     };
 
     await _updateData(background);
@@ -389,11 +407,20 @@ const CustomNodeFlow = () => {
                 </div>
                 <div className="col-auto">
                   <input
-                    type="color"
-                    value={fontStyle.stroke}
-                    onChange={(e) => _chooseFont(e.target.value, "stroke")}
+                    type="checkbox"
+                    checked={fontStyle.useStroke}
+                    onChange={(e) => _toggleStroke(e.target.checked)}
                   />
                 </div>
+                {fontStyle.useStroke && (
+                  <div className="col-auto">
+                    <input
+                      type="color"
+                      value={fontStyle.stroke}
+                      onChange={(e) => _chooseFont(e.target.value, "stroke")}
+                    />
+                  </div>
+                )}
                 <div className="col-auto">
                   <button
                     className="btn btn-sm btn-danger"
