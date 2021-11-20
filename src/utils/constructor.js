@@ -55,12 +55,12 @@ const _constructMachines = (machines) => {
       position: position.sensor || { y: 400, x: 200 * (index + 1) },
       type: "sensor",
       selectable: false,
-      style: {
-        padding: "10px",
-        background: "white",
-        opacity: 0.5,
-        borderRadius: 5,
-      },
+      // style: {
+      //   padding: "10px",
+      //   background: "white",
+      //   opacity: 0.5,
+      //   borderRadius: 5,
+      // },
       data: {
         machine_id: String(id),
         machine_name: name,
